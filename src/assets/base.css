@@ -94,6 +94,6 @@ body {
 }
 
 arcgis-map {
-  display: block;
+  display: flex;
   height: 100vh;
 }

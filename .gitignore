@@ -16,7 +16,8 @@ coverage
 .env
 /cypress/videos/
 /cypress/screenshots/
-
+./server/.env
+./server/secrets/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -28,3 +29,4 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+server/secrets/hooked-on-the-koots-4b43507ee9e9.json
