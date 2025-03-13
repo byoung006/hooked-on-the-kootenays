@@ -4,23 +4,23 @@ export interface PointData {
   latitude: number;
   longitude: number;
   camping: string;
-  trailLength?: string;
-  dogFriendly?: string;
-  hikeDifficultyLevel?: number;
-  hikeIn?: string;
+  trailLength: number;
+  dogFriendly: string;
+  hikeDifficultyLevel: number;
+  hikeIn: string;
   linkToWebsite?: string | undefined;
   [key: string]: string | number | undefined;
 }
 
 export const fieldMappings: { [key in keyof PointData]: string } = {
-  name: 'Name',
-  latitude: 'Latitude',
-  longitude: 'Longitude',
-  camping: 'Camping',
-  trailLength: 'Trail Length',
-  dogFriendly: 'Dog Friendly',
-  hikeDifficultyLevel: 'Hike Difficulty Level',
-  hikeIn: 'Hike In',
+  name: 'name',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  camping: 'camping',
+  trailLength: 'trail length',
+  dogFriendly: 'dog friendly',
+  hikeDifficultyLevel: 'hike difficulty level',
+  hikeIn: 'hike in',
   linkToWebsite: 'Link to Website',
 };
 
@@ -42,9 +42,14 @@ export function mapFieldsToPointData(fields: { [fieldName: string]: string | num
   // ... (your mapFieldsToPointData function)
   const pointData: PointData = {
     name: '',
-    latitude: 0,
     longitude: 0,
+    latitude: 0,
     camping: '',
+    trailLength: 0,
+    dogFriendly: '',
+    hikeDifficultyLevel: 0,
+    hikeIn: '',
+    linkToWebsite: '',
   };
 
   for (const fieldName in fields) {

@@ -19,7 +19,7 @@
       <div class="team-member">
         <h3>Hannah Murphy</h3>
         <p>GIS data lead, and project director</p>
-        <p>Hannah Murphey is a GIS professional passionate about leveraging spatial data for fisheries conservation. She
+        <p>Hannah Murphy is a GIS professional passionate about leveraging spatial data for fisheries conservation. She
           skillfully translates complex environmental data into clear, actionable maps and analyses. In her work, Hannah
           meticulously ensures data accuracy and employs the latest GIS techniques, demonstrating a commitment to
           professional excellence. She understands the critical role of spatial information in understanding fish
@@ -34,7 +34,9 @@
         <p>Lead Developer</p>
         <p>Bryce Young is a software developer with a passion for creating innovative and user-friendly solutions. He
           has a keen eye for detail and a commitment to delivering high-quality code. His personal interest in fishing
-          and camping inspires him to develop software that helps people connect with nature and enjoy the outdoors.</p>
+          and camping inspires him to develop software that helps people across a variety of
+          technologies and interests. He works with a variety of technologies day to day, and has a
+          keen eye on the technology sector, especially in how technology interfaces with nature</p>
       </div>
 
     </div>
@@ -47,7 +49,6 @@
 
     </p>
     <p>Email: <a href="mailto:byoung006@gmail.com">byoung006@gmail.com</a></p>
-    <p>Phone: 1-800-EXAMPLE</p>
   </div>
 </template>
 

@@ -20,7 +20,7 @@ interface PointData {
   latitude: number;
   longitude: number;
   camping: string;
-  trailLength?: string;
+  trailLength?: number;
   dogFriendly?: string;
   hikeDifficultyLevel?: number;
   hikeIn?: string;
@@ -190,7 +190,7 @@ export default defineComponent({
           latitude: newPoint.value.latitude,
           longitude: newPoint.value.longitude,
           camping: '',
-          trailLength: '',
+          trailLength: 0,
           dogFriendly: '',
           hikeDifficultyLevel: 0,
           hikeIn: '',

@@ -9,6 +9,7 @@
           field !== 'longitude' &&
           field !== 'camping' &&
           field !== 'dogFriendly' &&
+          field !== 'trailLength' &&
           field !== 'hikeIn' &&
           field !== 'hikeDifficultyLevel'
         " :class="{ error: invalidFields.includes(field) }">
@@ -25,7 +26,11 @@
             <option value="NO">NO</option>
           </select>
         </label>
-
+        <label class="input__label" v-else-if="field === 'trailLength'">
+          <p>{{ field + ' (In Meters)' }}:</p>
+          <input class="input__field" inputmode="numeric" min="0" :class="{ error: invalidFields.includes(field) }"
+            v-model="formData[field]" type="number" />
+        </label>
         <label class="input__label" v-else-if="field === 'dogFriendly'"
           :class="{ error: invalidFields.includes(field) }">
           <p>{{ field }}:</p>
@@ -63,19 +68,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watch, type PropType } from 'vue';
-
-interface PointData {
-  name: string;
-  latitude: number;
-  longitude: number;
-  camping: string;
-  trailLength?: string;
-  dogFriendly?: string;
-  hikeDifficultyLevel?: number;
-  hikeIn?: string;
-  linkToWebsite?: string | undefined;
-  [key: string]: string | number | undefined;
-}
+import { mapPointDataToFields, PointData } from '../../server/utils.ts'
 type PointDataKeys = Exclude<keyof PointData, 'latitude' | 'longitude' | 'hikeDifficultyLevel' |
   'linkToWebsite'>[];
 ;
@@ -116,28 +109,29 @@ export default defineComponent({
       return invalid;
     };
 
-    // Initialize invalidFields
     invalidFields.splice(0, invalidFields.length, ...validateFormData(props.formData));
     console.log(invalidFields, 'init')
-    // Watch for formData changes
     watch(
       () => props.formData,
       (newFormData) => {
         console.log(newFormData, 'the heck new')
         if (newFormData) { // Ensure newFormData exists
+          if (newFormData.trailLength) {
+            if (isNaN(newFormData.trailLength) || newFormData.trailLength < 0) {
+              newFormData.trailLength = 0
+            }
+          }
           for (const key in newFormData) {
             if (newFormData.hasOwnProperty(key) && newFormData[key]) {
-              // A field has changed
               const invalid = validateFormData(newFormData);
               invalidFields.splice(0, invalidFields.length, ...invalid);
-              break; //Revalidate whole form.
+              break;
             }
           }
         }
       },
       { deep: true }
     );
-
     watch(
       () => props.newPoint,
       (newPoint) => {
@@ -229,10 +223,49 @@ export default defineComponent({
   display: block;
   border-bottom: 0.3rem solid transparent;
   transition: all 0.3s;
+
+  input[type=number] {
+    -moz-appearance: textfield;
+    display: none;
+    /* Firefox */
+  }
+}
+
+.modal .input__field {
+  font-family: 'Roboto', sans-serif;
+  color: #282828;
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.2rem;
+  background-color: rgb(255, 255, 255);
+  border: none;
+  width: 75%;
+  display: block;
+  border-bottom: 0.3rem solid transparent;
+  transition: all 0.3s;
+
+  input[type=number] {
+    -moz-appearance: textfield;
+    display: none;
+    /* Firefox */
+  }
 }
 
 .modal .input__field.error {
   border: 2px solid red;
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0;
+    /* <-- Apparently some margin are still there even though it's hidden */
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+    /* Firefox */
+  }
 }
 
 

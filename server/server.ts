@@ -1,16 +1,15 @@
 import express, { Response, Request, Application } from 'express'
 import fs from 'fs'
 import cors from 'cors'
-import Papa from 'papaparse' // Import PapaParse
+import Papa from 'papaparse'
 import { Storage } from '@google-cloud/storage';
 import dotenv from 'dotenv';
 import { PointData, fieldMappings, mapPointDataToFields, mapFieldsToPointData } from './utils';
 dotenv.config({ path: './.env' });
 const app: Application = express()
-const port = 3000 // Choose a port
+const port = 3000
 app.use(cors({ origin: 'http://localhost:5173' }))
-app.use(express.json()) // Parse JSON requests
-
+app.use(express.json())
 
 function isString(value: any): value is string {
   return typeof value === 'string';
@@ -22,15 +21,13 @@ if (!isString(credentialsString)) {
   throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable is not a valid string.');
 }
 
-// Google Cloud Storage setup
 try {
 
   const storage = new Storage({
-    keyFilename: credentialsString, // Path to your service account key file
+    keyFilename: credentialsString,
   });
-  const bucketName = 'hooked-on-the-koots'; // Replace with your bucket name
-  const csvFilePath = 'data/FishingSpotsKootenays.csv'// Path to my remote csv file?
-
+  const bucketName = 'hooked-on-the-koots';
+  const csvFilePath = 'data/FishingSpotsKootenays.csv'
   interface PointData {
     name: string;
     latitude: number;
@@ -77,12 +74,11 @@ try {
       console.log(file, 'the file data')
       const [fileData] = await file.download();
       const csvData = fileData.toString();
-      //console.log(csvData, 'does file exist')
 
       Papa.parse(csvData, {
         header: true,
         complete: (results) => {
-          res.json(results); // Send the parsed CSV data as JSON
+          res.json(results);
         },
       });
     } catch (error) {
@@ -102,18 +98,15 @@ try {
         complete: async (results) => {
           let existingData = results.data;
 
-          // Validate and map the new data
           const newData = mapPointDataToFields(req.body);
 
-          // Add the new data
           existingData.push(newData);
 
-          // Unparse the combined data
           const updatedCsv = Papa.unparse(existingData);
+          console.log(updatedCsv, 'stuff')
 
           console.log(updatedCsv)
-          // Save the updated CSV
-          //await file.save(updatedCsv);
+          await file.save(updatedCsv);
           res.send('CSV file updated successfully.');
         },
         error: (error: Error) => {
