@@ -6,9 +6,6 @@ This project documents a variety of locations that people who are outdoor enthus
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 [Neovim](https://neovim.io/) + [Mason](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#volar) + [ts_ls](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#ts_ls) + [Volar](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#volar).
-```sh
-
-```
 
 ## Type Support for `.vue` Imports in TS
 
