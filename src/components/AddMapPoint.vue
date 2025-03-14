@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watch, type PropType } from 'vue';
-import { mapPointDataToFields, PointData } from '../../server/utils.ts'
+import { mapPointDataToFields, type PointData } from '../../server/utils.ts'
 type PointDataKeys = Exclude<keyof PointData, 'latitude' | 'longitude' | 'hikeDifficultyLevel' |
   'linkToWebsite'>[];
 ;
