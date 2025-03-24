@@ -8,8 +8,8 @@ export interface PointData {
   dogFriendly: string;
   hikeDifficultyLevel: number;
   hikeIn: string;
-  linkToWebsite?: string | undefined;
-  [key: string]: string | number | undefined;
+  linkToWebsite?: string;
+  //[key: string]: string | number | undefined;
 }
 
 export const fieldMappings: { [key in keyof PointData]: string } = {
@@ -24,14 +24,28 @@ export const fieldMappings: { [key in keyof PointData]: string } = {
   linkToWebsite: 'Link to Website',
 };
 
+export const csvHeaderMappings: { [key in keyof PointData]: string } = {
+  name: 'Name',
+  latitude: 'Latitude',
+  longitude: 'Longitude',
+  camping: 'Camping',
+  trailLength: 'Trail Length',
+  dogFriendly: 'Dog Friendly',
+  hikeDifficultyLevel: 'Hike Difficulty Level',
+  hikeIn: 'Hike In',
+  linkToWebsite: 'Link to Website',
+};
+
 export function mapPointDataToFields(pointData: PointData): { [fieldName: string]: string | number | undefined } {
-  // ... (your mapPointDataToFields function)
   const mappedData: { [fieldName: string]: string | number | undefined } = {};
 
-  for (const key in pointData) {
+  for (const [key, index] of Object.entries(pointData)) {
     if (pointData.hasOwnProperty(key) && fieldMappings.hasOwnProperty(key)) {
-      const fieldName = fieldMappings[key as keyof PointData];
-      mappedData[fieldName] = pointData[key];
+      const fieldName = csvHeaderMappings[key as keyof PointData];
+      console.log(key, index, fieldName);
+      if (fieldName && key) {
+        mappedData[fieldName] = pointData[key as keyof PointData];
+      }
     }
   }
 
@@ -39,7 +53,6 @@ export function mapPointDataToFields(pointData: PointData): { [fieldName: string
 }
 
 export function mapFieldsToPointData(fields: { [fieldName: string]: string | number | undefined }): PointData {
-  // ... (your mapFieldsToPointData function)
   const pointData: PointData = {
     name: '',
     longitude: 0,

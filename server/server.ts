@@ -4,7 +4,7 @@ import cors from 'cors'
 import Papa from 'papaparse'
 import { Storage } from '@google-cloud/storage';
 import dotenv from 'dotenv';
-import { PointData, fieldMappings, mapPointDataToFields, mapFieldsToPointData } from './utils';
+import { type PointData, fieldMappings, mapPointDataToFields, mapFieldsToPointData } from './utils';
 dotenv.config({ path: './.env' });
 const app: Application = express()
 const port = 3000
@@ -28,18 +28,6 @@ try {
   });
   const bucketName = 'hooked-on-the-koots';
   const csvFilePath = 'data/FishingSpotsKootenays.csv'
-  interface PointData {
-    name: string;
-    latitude: number;
-    longitude: number;
-    camping: string;
-    trailLength?: string;
-    dogFriendly?: string;
-    hikeDifficultyLevel?: number;
-    hikeIn?: string;
-    linkToWebsite?: string | undefined;
-    [key: string]: string | number | undefined;
-  }
 
   function validatePointData(data: any): data is PointData {
     const requiredFields: (keyof PointData)[] = [
@@ -86,8 +74,7 @@ try {
       res.status(500).send('Error reading CSV from GCS.');
     }
   });
-
-  app.post('/api/update-csv', async (req: Request, res: Response): Promise<any> => {
+  app.post('/api/update-csv', async (req: Request, res: Response) => {
     try {
       const file = storage.bucket(bucketName).file(csvFilePath);
       const [fileData] = await file.download();
@@ -98,14 +85,19 @@ try {
         complete: async (results) => {
           let existingData = results.data;
 
+          // Validate and map the new data
+          if (!validatePointData(req.body)) {
+            return res.status(400).send('Invalid Field Data');
+          }
           const newData = mapPointDataToFields(req.body);
 
+          // Add the new data
           existingData.push(newData);
 
+          // Unparse the combined data
           const updatedCsv = Papa.unparse(existingData);
-          console.log(updatedCsv, 'stuff')
 
-          console.log(updatedCsv)
+          // Save the updated CSV
           await file.save(updatedCsv);
           res.send('CSV file updated successfully.');
         },
@@ -119,6 +111,7 @@ try {
       res.status(500).send('Error updating CSV file.');
     }
   });
+
 
   app.get('/api/fishing-spots', async (req: Request, res: Response): Promise<any> => {
     try {

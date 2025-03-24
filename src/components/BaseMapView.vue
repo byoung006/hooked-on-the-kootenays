@@ -1,7 +1,7 @@
 <template>
   <div id='viewDiv' ref='viewDiv'></div>
   <Transition name="slide-fade" mode="out-in">
-    <AddMapPoint v-if="isModalOpen" :fields="pointDataKeys" :form-data="formData" :new-point='newPoint'
+    <AddMapPoint v-if="isModalOpen" :fields="fieldMappings" :form-data="formData" :new-point='newPoint'
       @save="handleCreatePoint" @close="closeModal" />
   </Transition>
 </template>
@@ -15,18 +15,7 @@ import Graphic from '@arcgis/core/Graphic';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import AddMapPoint from './AddMapPoint.vue';
 import { defineComponent, ref, reactive, onMounted, provide, watch } from 'vue';
-interface PointData {
-  name: string;
-  latitude: number;
-  longitude: number;
-  camping: string;
-  trailLength?: number;
-  dogFriendly?: string;
-  hikeDifficultyLevel?: number;
-  hikeIn?: string;
-  linkToWebsite?: string | undefined;
-  [key: string]: string | number | undefined;
-}
+import { fieldMappings, type PointData } from '../../server/utils.ts';
 
 interface Field {
   fieldName: string;
@@ -53,7 +42,7 @@ export default defineComponent({
       { fieldName: 'Link to Website' },
     ]);
     const formData = ref<PointData>({} as PointData);
-    const pointDataKeys: PointDataKeys = reactive([
+    let pointDataKeys: PointDataKeys = reactive([
       'name',
       'camping',
       'trailLength',
@@ -62,6 +51,7 @@ export default defineComponent({
       'linkToWebsite',
       'hikeDifficultyLevel'
     ]);
+
     const newPoint = ref({ latitude: 0, longitude: 0 });
     const csvData = ref<PointData[]>([]);
     const PointModule = ref<typeof Point | null>(null);
@@ -161,15 +151,27 @@ export default defineComponent({
         console.error(error, 'the error');
       }
     };
-    const handleClick = (event: any) => {
-      if (singleClick.value) {
-        clickTimer.value = setTimeout(() => {
-          newPoint.value.longitude = event.mapPoint.longitude;
-          newPoint.value.latitude = event.mapPoint.latitude;
-          isModalOpen.value = true;
+    const handleClick = async (event: any) => {
+      const response = await view.hitTest(event);
+      const newLongitude = event.mapPoint.longitude;
+      const newLatitude = event.mapPoint.latitude;
+
+      const isCloseToExistingPoint = response.results.some((graphic: any) => {
+        const existingLongitude = graphic?.graphic?.geometry?.longitude;
+        const existingLatitude = graphic?.graphic?.geometry?.latitude;
+        return (
+          Math.abs(existingLongitude - newLongitude) < 0.01 &&
+          Math.abs(existingLatitude - newLatitude) < 0.01
+        );
+      });
+      clickTimer.value = setTimeout(() => {
+        if (!isCloseToExistingPoint) {
+          newPoint.value.longitude = newLongitude;
+          newPoint.value.latitude = newLatitude;
           addPoint();
-        }, 250);
-      }
+        }
+      }, 250);
+
     };
     // We handle double click separately to ensure we don't mess with the map view functionality
     // provided by the arc-gis module imports
@@ -266,6 +268,7 @@ export default defineComponent({
       addPoint,
       handleCreatePoint,
       closeModal,
+      fieldMappings,
     };
   },
 });

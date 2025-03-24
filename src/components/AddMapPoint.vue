@@ -1,9 +1,10 @@
 <template>
   <div class="modal-overlay">
-    <div class="modal">
+    <div class="modal-wrapper">
       <h3>Add Fishing Spot Details</h3>
-      <span v-if="invalidFields.length > 0">Please fill all fields</span>
-      <div class="field-wrapper" v-for="field in fields" :key="field">
+      <span v-if="Object.values(invalidFields).some(Boolean)" class="error-message">Please fill all required
+        fields</span>
+      <div class="field-wrapper" v-for="field in Object.keys(fields)">
         <label class="input__label" v-if="
           field !== 'latitude' &&
           field !== 'longitude' &&
@@ -12,15 +13,17 @@
           field !== 'trailLength' &&
           field !== 'hikeIn' &&
           field !== 'hikeDifficultyLevel'
-        " :class="{ error: invalidFields.includes(field) }">
+        " :class="{
+          error: invalidFields[field]
+        }">
           <p>{{ field.toString() }}:</p>
-          <input class="input__field" :class="{ error: invalidFields.includes(field) }" v-model="formData[field]"
-            type="text" />
+          <input class="input__field" :class="{ error: invalidFields[field] }"
+            v-model="formData[field as keyof PointData]" type="text" />
         </label>
         <label class="input__label" v-else-if="field === 'camping' || field === 'hikeIn'"
-          :class="{ error: invalidFields.includes(field) }">
+          :class="{ error: invalidFields[field] }">
           <p>{{ field }}:</p>
-          <select class="input__field" :class="{ error: invalidFields.includes(field) }" v-model="formData[field]">
+          <select class="input__field" :class="{ error: invalidFields[field] }" v-model="formData[field]">
             <option value="">Select</option>
             <option value="YES">YES</option>
             <option value="NO">NO</option>
@@ -28,13 +31,12 @@
         </label>
         <label class="input__label" v-else-if="field === 'trailLength'">
           <p>{{ field + ' (In Meters)' }}:</p>
-          <input class="input__field" inputmode="numeric" min="0" :class="{ error: invalidFields.includes(field) }"
-            v-model="formData[field]" type="number" />
+          <input class="input__field" inputmode="numeric" min="0" :class="{ error: invalidFields[field] }"
+            v-model="formData.trailLength" type="number" />
         </label>
-        <label class="input__label" v-else-if="field === 'dogFriendly'"
-          :class="{ error: invalidFields.includes(field) }">
+        <label class="input__label" v-else-if="field === 'dogFriendly'" :class="{ error: invalidFields[field] }">
           <p>{{ field }}:</p>
-          <select class="input__field" :class="{ error: invalidFields.includes(field) }" v-model="formData[field]">
+          <select class="input__field" :class="{ error: invalidFields[field] }" v-model="formData.dogFriendly">
             <option value="">Select</option>
             <option value="Dogs off leash allowed">Dogs off leash allowed</option>
             <option value="Dogs on leash">Dogs on leash</option>
@@ -42,18 +44,19 @@
           </select>
         </label>
         <div class="hikeDifficulty" v-else-if="field === 'hikeDifficultyLevel'">
+
           <p class="input__label">Hike Difficulty Level:</p>
           <div class="field" v-for="level in [1, 2, 3, 4, 5]" :key="level">
             <input class='input' type="radio" :id="`difficulty-${level}`" :value="level.toString()"
-              v-model="formData[field]" />
+              v-model="formData.hikeDifficultyLevel" />
             <label class="label" :for="`difficulty-${level}`">{{ level }}</label>
           </div>
         </div>
-        <label class="input__label" v-else-if="field === 'latitude'" :class="{ error: invalidFields.includes(field) }">
+        <label class="input__label" v-else-if="field === 'latitude'" :class="{ error: invalidFields[field] }">
           <p>Latitude:</p>
           <p class="input__field">{{ formData.latitude }}</p>
         </label>
-        <label class="input__label" v-else-if="field === 'longitude'" :class="{ error: invalidFields.includes(field) }">
+        <label class="input__label" v-else-if="field === 'longitude'" :class="{ error: invalidFields[field] }">
           <p>Longitude:</p>
           <p class="input__field">{{ formData.longitude }}</p>
         </label>
@@ -68,15 +71,13 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watch, type PropType } from 'vue';
-import { mapPointDataToFields, type PointData } from '../../server/utils.ts'
-type PointDataKeys = Exclude<keyof PointData, 'latitude' | 'longitude' | 'hikeDifficultyLevel' |
-  'linkToWebsite'>[];
-;
+import { fieldMappings, mapPointDataToFields, type PointData } from '../../server/utils.ts'
+
 export default defineComponent({
   name: 'AddMapPoint',
   props: {
     fields: {
-      type: Array as PropType<PointDataKeys>,
+      type: Object as PropType<Record<string, string>>,
       required: true,
     },
     formData: {
@@ -84,48 +85,50 @@ export default defineComponent({
       required: true,
     },
     newPoint: {
-      type: Object as PropType<Record<string, any>>,
+      type: Object as PropType<Record<string, number>>,
       required: true,
     },
   },
   emits: ['save', 'close'],
   setup(props, { emit }) {
-    const invalidFields = reactive<PointDataKeys>([]);
+    // Initialize component state
+    const invalidFields = reactive<Record<string, boolean>>({});
     props.formData.latitude = props.newPoint.latitude;
     props.formData.longitude = props.newPoint.longitude;
-    console.log(props.fields)
-    const validateFormData = (formData: PointData): string[] => {
-      const invalid: string[] = [];
-      for (const key in formData) {
-        if (formData.hasOwnProperty(key)) {
-          const value = formData[key];
-          if (key !== 'latitude' && key !== 'longitude' && key !== 'linkToWebsite') {
-            if (!value || (typeof value === 'string' && value.trim() === '')) {
-              invalid.push(key);
-            }
-          }
-        }
-      }
-      return invalid;
-    };
+    // Initialize invalidFields
+    Object.keys(props.fields).forEach((field: string, index) => {
+      invalidFields[field] = false;
+    });
+    // Methods
+    const validateFormData = (formData: PointData, invalidFields: Record<string, any>): Record<string, boolean> => {
+      const optionalFields = ['latitude', 'longitude', 'linkToWebsite'];
 
-    invalidFields.splice(0, invalidFields.length, ...validateFormData(props.formData));
-    console.log(invalidFields, 'init')
+      Object.keys(props.fields).forEach((key: string) => {
+        const value = formData[key as keyof PointData];
+        const isOptionalField = optionalFields.includes(key);
+
+        if (!isOptionalField) {
+          const isEmpty = !value || (typeof value === 'string' && value.trim() === '');
+          invalidFields[key] = isEmpty;
+        }
+      });
+
+      return invalidFields;
+    };
     watch(
       () => props.formData,
       (newFormData) => {
-        console.log(newFormData, 'the heck new')
-        if (newFormData) { // Ensure newFormData exists
-          if (newFormData.trailLength) {
-            if (isNaN(newFormData.trailLength) || newFormData.trailLength < 0) {
-              newFormData.trailLength = 0
+        if (newFormData) {
+          if (newFormData.trailLength !== undefined) {
+            const trailLengthValue = Number(newFormData.trailLength);
+            if (isNaN(trailLengthValue) || trailLengthValue < 0) {
+              newFormData.trailLength = 0;
             }
           }
-          for (const key in newFormData) {
-            if (newFormData.hasOwnProperty(key) && newFormData[key]) {
-              const invalid = validateFormData(newFormData);
-              invalidFields.splice(0, invalidFields.length, ...invalid);
-              break;
+          const validationResults = validateFormData(newFormData, invalidFields);
+          for (const key in validationResults) {
+            if (validationResults.hasOwnProperty(key)) {
+              invalidFields[key] = validationResults[key];
             }
           }
         }
@@ -135,13 +138,14 @@ export default defineComponent({
     watch(
       () => props.newPoint,
       (newPoint) => {
-        props.formData.latitude = newPoint.latitude;
-        props.formData.longitude = newPoint.longitude;
+        props.formData.latitude = newPoint.latitude as number;
+        props.formData.longitude = newPoint.longitude as number;
       },
     );
 
     const save = () => {
-      if (invalidFields.length > 0) {
+      const hasErrors = Object.values(invalidFields).some(Boolean);
+      if (hasErrors) {
         console.log('nope')
         return
       }
@@ -158,6 +162,7 @@ export default defineComponent({
       save,
       close,
       invalidFields,
+      validateFormData,
     };
   },
 });
@@ -177,7 +182,7 @@ export default defineComponent({
   z-index: 1000;
 }
 
-.modal {
+.modal-wrapper {
   display: flex !important;
   flex-direction: column;
   background-color: #333;
@@ -190,7 +195,7 @@ export default defineComponent({
   /* Set a maximum width */
 }
 
-.modal .input__label {
+.modal-wrapper .input__label {
   font-family: 'Roboto', sans-serif;
   font-size: 1.2rem;
   margin-left: 2rem;
@@ -200,18 +205,18 @@ export default defineComponent({
   transform: translateY(0rem);
 }
 
-.modal .input__label::first-letter {
+.modal-wrapper .input__label::first-letter {
   text-transform: capitalize;
 }
 
-.modal .error-message {
+.modal-wrapper .error-message {
   color: red;
   font-size: 0.8rem;
   margin-top: 0.2rem;
   display: block;
 }
 
-.modal .input__field {
+.modal-wrapper .input__field {
   font-family: 'Roboto', sans-serif;
   color: #282828;
   font-size: 1.2rem;
@@ -234,7 +239,7 @@ export default defineComponent({
 .modal .input__field {
   font-family: 'Roboto', sans-serif;
   color: #282828;
-  font-size: 1.2rem;
+  font-size: 1.0rem;
   padding: 0.5rem 1rem;
   border-radius: 0.2rem;
   background-color: rgb(255, 255, 255);
@@ -251,7 +256,7 @@ export default defineComponent({
   }
 }
 
-.modal .input__field.error {
+.modal-wrapper .input__field.error {
   border: 2px solid red;
 
   input::-webkit-outer-spin-button,
@@ -269,11 +274,11 @@ export default defineComponent({
 }
 
 
-.modal h3 {
+.modal-wrapper h3 {
   margin-top: 0;
 }
 
-.modal .error-message {
+.modal-wrapper .error-message {
   color: red;
   font-size: 0.8rem;
   margin-top: 0.2rem;
@@ -322,13 +327,13 @@ export default defineComponent({
   border-width: 8px;
 }
 
-hikeDifficulty .field .input:checked {
+.hikeDifficulty .field .input:checked {
   border-color: #1976d2;
   transform: scale(1.1);
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-hikeDifficulty .field .label {
+.hikeDifficulty .field .label {
   text-align: center;
 }
 
@@ -342,23 +347,35 @@ hikeDifficulty .field .label {
 
 /* Media Queries for Mobile */
 @media (max-width: 768px) {
-  .modal {
+  .modal-wrapper {
     padding: 1.5rem;
     /* Reduce padding on mobile */
   }
 
-  .modal .input__label,
-  .modal .input__field {
+  .modal-wrapper .input__label,
+  .modal-wrapper .input__field {
     font-size: 1rem;
     /* Reduce font size on mobile */
   }
 
-  .modal .field-wrapper .hikeDifficulty .label {
+  .modal-wrapper .field-wrapper .hikeDifficulty .label {
     text-align: center;
   }
 
-  .modal .field-wrapper .hikeDifficulty .field {
+  .modal-wrapper .field-wrapper .hikeDifficulty .field {
     margin-left: 1rem;
+  }
+}
+
+@media (max-width: 1920px) {
+  .modal-wrapper {
+    max-height: 90vh;
+  }
+
+  .modal-wrapper .input__label,
+  .modal-wrapper .input__field {
+    font-size: 0.85rem;
+    /* Reduce font size on mobile */
   }
 }
 </style>

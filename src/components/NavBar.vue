@@ -8,12 +8,6 @@
       <li class="nav-item">
         <RouterLink to="/about" class="nav-link">About</RouterLink>
       </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">Services</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link">Contact</a>
-      </li>
     </ul>
   </nav>
 </template>
