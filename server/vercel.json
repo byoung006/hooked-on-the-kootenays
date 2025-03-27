@@ -19,7 +19,7 @@
       "dest": "server/index.js"
     },
     {
-      "src": "/healthz",
+      "src": "api/healthz",
       "dest": "server/index.js"
     },
     {

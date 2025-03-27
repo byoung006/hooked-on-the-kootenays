@@ -17,7 +17,6 @@ const isTestEnv = process.env.NODE_ENV === 'test';
 function isString(value: any): value is string {
   return typeof value === 'string';
 }
-console.log(credentialsString, 'this thing')
 if (!isTestEnv && !isString(credentialsString)) {
   throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable is not a valid string.');
 }
@@ -57,22 +56,7 @@ try {
   }
 
   app.get('/api/healthz', async (req: Request, res: Response): Promise<any> => {
-    try {
-      const csvData = isTestEnv
-        ? fs.readFileSync(csvFilePath, 'utf8')
-        : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
-
-
-      Papa.parse(csvData, {
-        header: true,
-        complete: (results) => {
-          res.json(results);
-        },
-      });
-    } catch (error) {
-      console.error('Error reading CSV from GCS:', error);
-      res.status(500).send('Error reading CSV from GCS.');
-    }
+    res.send('Healthy');
   });
   app.post('/api/update-csv', async (req: Request, res: Response) => {
     try {
