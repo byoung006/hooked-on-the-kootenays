@@ -4,30 +4,30 @@ import cors from 'cors'
 import Papa from 'papaparse'
 import { Storage } from '@google-cloud/storage';
 import dotenv from 'dotenv';
-import { type PointData, fieldMappings, mapPointDataToFields, mapFieldsToPointData } from './utils';
+import { type PointData, fieldMappings, mapPointDataToFields } from './utils';
+
+export const app: Application = express()
 dotenv.config({ path: './.env' });
-const app: Application = express()
 const port = 3000
 app.use(cors({ origin: 'http://localhost:5173' }))
 app.use(express.json())
 
+const credentialsString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+const isTestEnv = process.env.NODE_ENV === 'test';
 function isString(value: any): value is string {
   return typeof value === 'string';
 }
-
-const credentialsString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 console.log(credentialsString, 'this thing')
-if (!isString(credentialsString)) {
+if (!isTestEnv && !isString(credentialsString)) {
   throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable is not a valid string.');
 }
 
 try {
-
-  const storage = new Storage({
+  const storage = isTestEnv ? undefined : new Storage({
     keyFilename: credentialsString,
   });
-  const bucketName = 'hooked-on-the-koots';
-  const csvFilePath = 'data/FishingSpotsKootenays.csv'
+  const bucketName = process.env.GCLOUD_STORAGE_BUCKET || 'hooked-on-the-koots';
+  const csvFilePath = isTestEnv ? './FishingSpotsKootenays.csv' : 'data/FishingSpotsKootenays.csv'
 
   function validatePointData(data: any): data is PointData {
     const requiredFields: (keyof PointData)[] = [
@@ -58,10 +58,10 @@ try {
 
   app.get('/api/healthz', async (req: Request, res: Response): Promise<any> => {
     try {
-      const file = storage.bucket(bucketName).file(csvFilePath);
-      console.log(file, 'the file data')
-      const [fileData] = await file.download();
-      const csvData = fileData.toString();
+      const csvData = isTestEnv
+        ? fs.readFileSync(csvFilePath, 'utf8')
+        : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
+
 
       Papa.parse(csvData, {
         header: true,
@@ -76,9 +76,10 @@ try {
   });
   app.post('/api/update-csv', async (req: Request, res: Response) => {
     try {
-      const file = storage.bucket(bucketName).file(csvFilePath);
-      const [fileData] = await file.download();
-      const csvData = fileData.toString();
+      const csvData = isTestEnv
+        ? fs.readFileSync(csvFilePath, 'utf8')
+        : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
+
 
       Papa.parse(csvData, {
         header: true,
@@ -97,8 +98,11 @@ try {
           // Unparse the combined data
           const updatedCsv = Papa.unparse(existingData);
 
-          // Save the updated CSV
-          await file.save(updatedCsv);
+          if (isTestEnv) {
+            fs.writeFileSync(csvFilePath, updatedCsv);
+          } else {
+            await storage!.bucket(bucketName).file(csvFilePath).save(updatedCsv);
+          }
           res.send('CSV file updated successfully.');
         },
         error: (error: Error) => {
@@ -115,9 +119,9 @@ try {
 
   app.get('/api/fishing-spots', async (req: Request, res: Response): Promise<any> => {
     try {
-      const file = storage.bucket(bucketName).file(csvFilePath)
-      const [fileData] = await file.download();
-      const csvData = fileData.toString();
+      const csvData = isTestEnv
+        ? fs.readFileSync(csvFilePath, 'utf8')
+        : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
 
       Papa.parse(csvData, {
         header: true,

@@ -52,27 +52,27 @@ export function mapPointDataToFields(pointData: PointData): { [fieldName: string
   return mappedData;
 }
 
-export function mapFieldsToPointData(fields: { [fieldName: string]: string | number | undefined }): PointData {
-  const pointData: PointData = {
-    name: '',
-    longitude: 0,
-    latitude: 0,
-    camping: '',
-    trailLength: 0,
-    dogFriendly: '',
-    hikeDifficultyLevel: 0,
-    hikeIn: '',
-    linkToWebsite: '',
-  };
-
-  for (const fieldName in fields) {
-    if (fields.hasOwnProperty(fieldName)) {
-      const pointDataKey = (Object.keys(fieldMappings) as (keyof PointData)[]).find(key => fieldMappings[key] === fieldName);
-      if (pointDataKey) {
-        pointData[pointDataKey] = fields[fieldName];
-      }
-    }
-  }
-
-  return pointData;
-}
+//export function mapFieldsToPointData(fields: { [fieldName: string]: string | number | undefined }): PointData {
+//  const pointData: PointData = {
+//    name: '',
+//    longitude: 0,
+//    latitude: 0,
+//    camping: '',
+//    trailLength: 0,
+//    dogFriendly: '',
+//    hikeDifficultyLevel: 0,
+//    hikeIn: '',
+//    linkToWebsite: '',
+//  };
+//
+//  for (const fieldName in fields) {
+//    if (fields.hasOwnProperty(fieldName)) {
+//      const pointDataKey = (Object.keys(fieldMappings) as (keyof PointData)[]).find(key => fieldMappings[key] === fieldName);
+//      if (pointDataKey) {
+//        pointData[pointDataKey] = fields[fieldName];
+//      }
+//    }
+//  }
+//
+//  return pointData;
+//}

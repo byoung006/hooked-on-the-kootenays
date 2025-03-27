@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug Backend Tests",
+      "program": "${workspaceFolder}/server/node_modules/mocha/bin/mocha",
+      "args": [
+        "--require",
+        "dotenv/config",
+        "--import=tsx",
+        "--inspect",
+        "${workspaceFolder}/server/__tests__/**/*.test.ts"
+      ],
+      "cwd": "${workspaceFolder}/server",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}
