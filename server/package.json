@@ -9,7 +9,7 @@
     "test:watch": "NODE_ENV=test mocha --require dotenv/config --import=tsx --require source-map-support/register --inspect --exit --watch __tests__/**/*.test.ts",
     "start": "node dist/server.js",
     "dev": "nodemon --exec tsx --inspect server.ts",
-    "build": "npx pkgroll"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
