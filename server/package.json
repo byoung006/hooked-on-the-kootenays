@@ -10,7 +10,7 @@
     "start": "node dist/server.js",
     "dev": "nodemon --exec tsx --inspect server.ts",
     "build": "tsc",
-    "vercel-build": "echo we be buildin'..."
+    "vercel-build": "echo we be buildin..."
   },
   "keywords": [],
   "author": "",
