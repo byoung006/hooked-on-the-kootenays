@@ -18,6 +18,7 @@ coverage
 /cypress/screenshots/
 ./server/.env
 ./server/secrets/
+./secrets/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

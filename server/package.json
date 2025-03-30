@@ -1,7 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend server for hooked-on-the-kootenays application",
   "main": "server.js",
   "exports": "./dist/server.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "test:watch": "NODE_ENV=test mocha --require dotenv/config --import=tsx --require source-map-support/register --inspect --exit --watch __tests__/**/*.test.ts",
     "start": "node dist/server.js",
     "dev": "nodemon --exec tsx --inspect server.ts",
-    "build": "tsc --outDir dist",
+    "clean": "rm -rf api/dist",
+    "build": "npm run clean && tsc",
     "vercel-build": "echo we be buildin..."
   },
   "keywords": [],
@@ -21,7 +22,6 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
   },
-  "type": "module",
   "devDependencies": {
     "@google-cloud/storage": "^7.15.2",
     "@types/chai": "^5.2.1",

@@ -1,22 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
-    "moduleResolution": "Node",
-    "outDir": "./dist",
-    "rootDir": "./",
-    "strict": true,
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./api/dist",
+    "rootDir": "./api",
+    "baseUrl": ".",
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "allowSyntheticDefaultImports": true
+  },
+  "paths": {
+    "*": [
+      "node_modules/*",
+      "api/types/*"
+    ]
   },
   "include": [
-    "server.ts",
-    "src/**/*.ts"
+    "api/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist",
     "__tests__"
   ]
 }
