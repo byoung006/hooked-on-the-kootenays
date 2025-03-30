@@ -51,7 +51,19 @@ export function mapPointDataToFields(pointData: PointData): { [fieldName: string
 
   return mappedData;
 }
-
+export const getGCPCredentials = () => {
+  // for Vercel, use environment variables
+  return process.env.GCP_PRIVATE_KEY
+    ? {
+      credentials: {
+        client_email: process.env.GCP_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GCP_PRIVATE_KEY,
+      },
+      projectId: process.env.GCP_PROJECT_ID,
+    }
+    // for local development, use gcloud CLI
+    : {};
+};
 //export function mapFieldsToPointData(fields: { [fieldName: string]: string | number | undefined }): PointData {
 //  const pointData: PointData = {
 //    name: '',

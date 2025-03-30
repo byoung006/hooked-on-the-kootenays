@@ -4,7 +4,7 @@ import cors from 'cors'
 import Papa from 'papaparse'
 import { Storage } from '@google-cloud/storage';
 import dotenv from 'dotenv';
-import { type PointData, fieldMappings, mapPointDataToFields } from './utils';
+import { type PointData, mapPointDataToFields, getGCPCredentials } from './utils';
 
 export const app: Application = express()
 dotenv.config({ path: './.env' });
@@ -12,20 +12,14 @@ const port = 3000
 app.use(cors({ origin: 'http://localhost:5173' }))
 app.use(express.json())
 
-const credentialsString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const isTestEnv = process.env.NODE_ENV === 'test';
-function isString(value: any): value is string {
-  return typeof value === 'string';
-}
-if (!isTestEnv && !isString(credentialsString)) {
-  throw new Error('GOOGLE_APPLICATION_CREDENTIALS environment variable is not a valid string.');
-}
 
 try {
-  const storage = isTestEnv ? undefined : new Storage({
-    keyFilename: credentialsString,
-  });
-  const bucketName = process.env.GCLOUD_STORAGE_BUCKET || 'hooked-on-the-koots';
+  //const storage = isTestEnv ? undefined : new Storage({
+  //  keyFilename: credentialsString,
+  //});
+  const storage = new Storage(getGCPCredentials());
+  const bucketName = 'hooked-on-the-koots';
   const csvFilePath = isTestEnv ? './FishingSpotsKootenays.csv' : 'data/FishingSpotsKootenays.csv'
 
   function validatePointData(data: any): data is PointData {
