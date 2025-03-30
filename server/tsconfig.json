@@ -15,6 +15,9 @@
       "api/types/*"
     ]
   },
+  "types": [
+    "node"
+  ],
   "include": [
     "api/**/*.ts"
   ],
