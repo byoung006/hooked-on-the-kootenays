@@ -1,4 +1,4 @@
-
+import { env } from "process";
 export interface PointData {
   name: string;
   latitude: number;
@@ -53,13 +53,13 @@ export function mapPointDataToFields(pointData: PointData): { [fieldName: string
 }
 export const getGCPCredentials = () => {
   // for Vercel, use environment variables
-  return process.env.GCP_PRIVATE_KEY
+  return env.GCP_PRIVATE_KEY
     ? {
       credentials: {
-        client_email: process.env.GCP_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GCP_PRIVATE_KEY,
+        client_email: env.GCP_SERVICE_ACCOUNT_EMAIL,
+        private_key: env.GCP_PRIVATE_KEY,
       },
-      projectId: process.env.GCP_PROJECT_ID,
+      projectId: env.GCP_PROJECT_ID,
     }
     // for local development, use gcloud CLI
     : {};
