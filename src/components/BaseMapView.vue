@@ -15,7 +15,7 @@ import Graphic from '@arcgis/core/Graphic';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import AddMapPoint from './AddMapPoint.vue';
 import { defineComponent, ref, reactive, onMounted, provide, watch } from 'vue';
-import { fieldMappings, type PointData } from '../../server/utils.ts';
+import { fieldMappings, type PointData } from '../../server/api/utils';
 
 interface Field {
   fieldName: string;

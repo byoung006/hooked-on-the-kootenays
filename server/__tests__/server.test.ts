@@ -1,11 +1,9 @@
 import request from 'supertest';
 import { expect } from 'chai';
 
-import * as sut from '../server.ts';
-import fs from 'fs';
+import * as sut from '../api/server.ts';
 import { Application } from 'express';
-import { PointData } from '../utils.ts';
-import { fieldMappings, csvHeaderMappings, mapPointDataToFields } from '../utils';
+import { fieldMappings, csvHeaderMappings, mapPointDataToFields } from '../api/utils.ts';
 
 describe('Server Endpoints', () => {
   let server: Application;

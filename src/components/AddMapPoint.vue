@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watch, type PropType } from 'vue';
-import { fieldMappings, mapPointDataToFields, type PointData } from '../../server/utils.ts'
+import { fieldMappings, mapPointDataToFields, type PointData } from '../../server/api/utils.ts'
 
 export default defineComponent({
   name: 'AddMapPoint',
