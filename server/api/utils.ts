@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
+
 export interface PointData {
   name: string;
   latitude: number;
