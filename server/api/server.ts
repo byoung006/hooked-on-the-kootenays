@@ -9,7 +9,20 @@ import { type PointData, mapPointDataToFields, getGCPCredentials } from './utils
 export const app: Application = express()
 dotenv.config({ path: './.env' });
 const port = 3000
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://hooked-on-the-kootenays-backend.vercel.app',
+      'https://hooked-on-the-kootenays-q9quucwhy-byoung006s-projects.vercel.app'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 app.use(express.json())
 
 const isTestEnv = process.env.NODE_ENV === 'test';
