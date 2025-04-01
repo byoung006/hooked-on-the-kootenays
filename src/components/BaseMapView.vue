@@ -17,6 +17,7 @@ import AddMapPoint from './AddMapPoint.vue';
 import { defineComponent, ref, reactive, onMounted, provide, watch } from 'vue';
 import { fieldMappings, type PointData } from '../../server/api/utils';
 
+
 interface Field {
   fieldName: string;
 }
@@ -28,6 +29,7 @@ export default defineComponent({
     AddMapPoint
   },
   setup() {
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
     let isModalOpen = ref(false);
     let isPointAdded = ref(false);
     const modalFields = ref<Field[]>([
@@ -83,7 +85,7 @@ export default defineComponent({
     });
     const loadMap = async () => {
       try {
-        const response = await fetch('/api/fishing-spots');
+        const response = await fetch(`${API_URL}/api/fishing-spots`);
         const results = await response.json();
 
         if (!results || !results.data) {
@@ -227,7 +229,7 @@ export default defineComponent({
         csvData.value.push(formDataValue);
 
         try {
-          const response = await fetch('api/update-csv', {
+          const response = await fetch(`${API_URL}/api/update-csv`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formDataValue),

@@ -29,6 +29,7 @@ export default defineConfig({
       GCP_SERVICE_ACCOUNT_EMAIL: JSON.stringify(process.env.GCP_SERVICE_ACCOUNT_EMAIL),
       GCP_PRIVATE_KEY: JSON.stringify(process.env.GCP_PRIVATE_KEY),
       GCP_PROJECT_ID: JSON.stringify(process.env.GCP_PROJECT_ID),
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL),
     },
   },
   server: {
