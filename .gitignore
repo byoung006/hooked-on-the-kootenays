@@ -31,3 +31,4 @@ coverage
 
 *.tsbuildinfo
 server/secrets/hooked-on-the-koots-4b43507ee9e9.json
+.vercel
