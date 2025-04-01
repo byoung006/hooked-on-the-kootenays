@@ -13,8 +13,7 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       'http://localhost:5173',
-      'https://hooked-on-the-kootenays-backend.vercel.app',
-      'https://hooked-on-the-kootenays-q9quucwhy-byoung006s-projects.vercel.app'
+      'https://hooked-on-the-kootenays.vercel.app',
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);

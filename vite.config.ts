@@ -37,6 +37,7 @@ export default defineConfig({
       '/api': {
         target: 'https://hooked-on-the-koots-backend.vercel.app',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }
