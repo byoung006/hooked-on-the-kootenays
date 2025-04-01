@@ -8,7 +8,7 @@
   "exclude": [
     "node_modules",
     "./secrets/",
-    "./server/"
+    "./server/**/*"
   ],
   "references": [
     {
