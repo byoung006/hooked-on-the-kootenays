@@ -1,5 +1,15 @@
 {
+  "compilerOptions": {
+    "types": [
+      "node"
+    ]
+  },
   "files": [],
+  "exclude": [
+    "node_modules",
+    "./secrets/",
+    "./server/"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

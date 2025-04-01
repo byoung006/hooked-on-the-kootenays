@@ -17,6 +17,19 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+
+  build: {
+    rollupOptions: {
+      external: ['./server/'] // Adjust the path to your server directory
+    }
+  },
+  define: {
+    'process.env': {
+      GCP_SERVICE_ACCOUNT_EMAIL: JSON.stringify(process.env.GCP_SERVICE_ACCOUNT_EMAIL),
+      GCP_PRIVATE_KEY: JSON.stringify(process.env.GCP_PRIVATE_KEY),
+      GCP_PROJECT_ID: JSON.stringify(process.env.GCP_PROJECT_ID),
+    },
+  },
   server: {
     proxy: {
       '/api': {
