@@ -12,7 +12,7 @@ const port = 3000
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'http://localhost:5173',
+      //'http://localhost:5173',
       'https://hooked-on-the-kootenays.vercel.app',
     ];
     if (!origin || allowedOrigins.includes(origin)) {
