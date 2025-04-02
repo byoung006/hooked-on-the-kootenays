@@ -1,5 +1,6 @@
 import express, { Response, Request, Application } from 'express'
 import fs from 'fs'
+import path from 'path'
 import cors from 'cors'
 import Papa from 'papaparse'
 import { Storage } from '@google-cloud/storage';
@@ -9,12 +10,40 @@ import { type PointData, mapPointDataToFields, getGCPCredentials } from './utils
 export const app: Application = express()
 dotenv.config({ path: './.env' });
 const port = 3000
+// check environments, and set variables for later use in logic
+const isTestEnv = process.env.NODE_ENV === 'test';
+const isDevEnv = process.env.NODE_ENV === 'development';
+const isProdEnv = process.env.NODE_ENV === 'production';
+// switch case to load in the environment
+let envFile: string;
+
+switch (process.env.NODE_ENV) {
+  case 'development':
+    envFile = '.env.development';
+    break;
+  case 'production':
+    envFile = '.env.production';
+    break;
+  case 'test':
+    envFile = '.env.test';
+    break;
+  default:
+    envFile = '.env'; // Fallback to a default .env file
+    break;
+}
+
+dotenv.config({ path: path.resolve(__dirname, `../${envFile}`) });
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
-      //'http://localhost:5173',
+      'http://localhost:5173',
       'https://hooked-on-the-kootenays.vercel.app',
     ];
+    console.log('Origin:', origin);
+    if (origin === allowedOrigins[0]) {
+      console.log('Localhost allowed');
+      return callback(null, true);
+    }
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -24,7 +53,6 @@ app.use(cors({
 }));
 app.use(express.json())
 
-const isTestEnv = process.env.NODE_ENV === 'test';
 
 try {
   //const storage = isTestEnv ? undefined : new Storage({
@@ -32,7 +60,7 @@ try {
   //});
   const storage = new Storage(getGCPCredentials());
   const bucketName = 'hooked-on-the-koots';
-  const csvFilePath = isTestEnv ? './FishingSpotsKootenays.csv' : 'data/FishingSpotsKootenays.csv'
+  const csvFilePath = isTestEnv || isDevEnv ? './FishingSpotsKootenays.csv' : 'data/FishingSpotsKootenays.csv'
 
   function validatePointData(data: any): data is PointData {
     const requiredFields: (keyof PointData)[] = [
@@ -66,7 +94,8 @@ try {
   });
   app.post('/api/update-csv', async (req: Request, res: Response) => {
     try {
-      const csvData = isTestEnv
+
+      const csvData = isTestEnv || isDevEnv
         ? fs.readFileSync(csvFilePath, 'utf8')
         : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
 
@@ -109,7 +138,7 @@ try {
 
   app.get('/api/fishing-spots', async (req: Request, res: Response): Promise<any> => {
     try {
-      const csvData = isTestEnv
+      const csvData = isTestEnv || isDevEnv
         ? fs.readFileSync(csvFilePath, 'utf8')
         : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
 

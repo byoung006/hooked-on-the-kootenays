@@ -35,9 +35,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://hooked-on-the-koots-backend.vercel.app',
+        target: 'http://localhost:3000/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        //rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

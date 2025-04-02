@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-overlay">
+  <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-wrapper">
       <h3>Add Fishing Spot Details</h3>
       <span v-if="Object.values(invalidFields).some(Boolean)" class="error-message">Please fill all required
@@ -180,6 +180,10 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 5vh 10px;
+  /* Add padding to the overlay for spacing */
+  box-sizing: border-box;
+  /* Include padding in width/height calculations */
 }
 
 .modal-wrapper {
@@ -193,6 +197,12 @@ export default defineComponent({
   /* Adjust width for mobile */
   max-width: 500px;
   /* Set a maximum width */
+  max-height: 90vh;
+  /* Limit modal height to 90% of viewport */
+  overflow-y: auto;
+  /* Enable scrolling for long content */
+  box-sizing: border-box;
+  /* Include padding in width/height calculations */
 }
 
 .modal-wrapper .input__label {
@@ -368,9 +378,6 @@ export default defineComponent({
 }
 
 @media (max-width: 1920px) {
-  .modal-wrapper {
-    max-height: 90vh;
-  }
 
   .modal-wrapper .input__label,
   .modal-wrapper .input__field {

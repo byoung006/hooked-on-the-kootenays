@@ -8,7 +8,7 @@
     "test": "NODE_ENV=test mocha --require dotenv/config  __tests__/**/*.test.ts --import=tsx --exit",
     "test:watch": "NODE_ENV=test mocha --require dotenv/config --import=tsx --require source-map-support/register --inspect --exit --watch __tests__/**/*.test.ts",
     "start": "node dist/server.js",
-    "dev": "nodemon --exec tsx --inspect server.ts",
+    "dev": "NODE_ENV=development nodemon --exec tsx --inspect ../server/api/server.ts",
     "clean": "rm -rf api/dist",
     "build": "npm run clean && tsc",
     "vercel-build": "echo we be buildin..."
