@@ -104,6 +104,7 @@ export default {
 }
 
 .intro-container p {
+  color: #666;
   line-height: 1.5;
   grid-template-columns: 1fr;
   font-size: 1.2rem;
@@ -151,6 +152,7 @@ export default {
 }
 
 .contact-container p {
+  color: #666;
   line-height: 1.5;
   grid-template-columns: 1fr;
   font-size: 1.2rem;
