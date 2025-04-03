@@ -14,22 +14,25 @@ const port = 3000
 const isTestEnv = process.env.NODE_ENV === 'test';
 const isDevEnv = process.env.NODE_ENV === 'development';
 const isProdEnv = process.env.NODE_ENV === 'production';
-// switch case to load in the environment
+// switch case to load in the .env file based on the environment
 let envFile: string;
 
-switch (process.env.NODE_ENV) {
-  case 'development':
-    envFile = '.env.development';
-    break;
-  case 'production':
-    envFile = '.env.production';
-    break;
-  case 'test':
-    envFile = '.env.test';
-    break;
-  default:
-    envFile = '.env'; // Fallback to a default .env file
-    break;
+function getEnvironment(environment: string): string {
+  switch (environment) {
+    case 'development':
+      envFile = '.env.development';
+      return 'development';
+    case 'production':
+      envFile = '.env.production';
+      return 'production';
+    case 'test':
+      envFile = '.env.test';
+      return 'test';
+    default:
+      envFile = '.env.development'; // Fallback to a development .env file
+      return 'development';
+  }
+
 }
 
 dotenv.config({ path: path.resolve(__dirname, `../${envFile}`) });
@@ -55,12 +58,14 @@ app.use(express.json())
 
 
 try {
-  //const storage = isTestEnv ? undefined : new Storage({
-  //  keyFilename: credentialsString,
-  //});
+  const env = getEnvironment(process.env.NODE_ENV);
+  console.log(env, 'env')
   const storage = new Storage(getGCPCredentials());
+  console.log(storage, 'storage')
   const bucketName = 'hooked-on-the-koots';
-  const csvFilePath = isTestEnv || isDevEnv ? './FishingSpotsKootenays.csv' : 'data/FishingSpotsKootenays.csv'
+  const localCSVFilePath = path.resolve(__dirname, '../../server/FishingSpotsKootenays.csv');
+  console.log(localCSVFilePath, 'localCSVFilePath')
+  const csvFilePath = !isProdEnv ? localCSVFilePath : 'data/FishingSpotsKootenays.csv'
 
   function validatePointData(data: any): data is PointData {
     const requiredFields: (keyof PointData)[] = [
@@ -94,8 +99,8 @@ try {
   });
   app.post('/api/update-csv', async (req: Request, res: Response) => {
     try {
-
-      const csvData = isTestEnv || isDevEnv
+      console.log(csvFilePath, 'path')
+      const csvData = !isProdEnv
         ? fs.readFileSync(csvFilePath, 'utf8')
         : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
 
@@ -117,7 +122,7 @@ try {
           // Unparse the combined data
           const updatedCsv = Papa.unparse(existingData);
 
-          if (isTestEnv) {
+          if (!isProdEnv) {
             fs.writeFileSync(csvFilePath, updatedCsv);
           } else {
             await storage!.bucket(bucketName).file(csvFilePath).save(updatedCsv);
@@ -138,7 +143,7 @@ try {
 
   app.get('/api/fishing-spots', async (req: Request, res: Response): Promise<any> => {
     try {
-      const csvData = isTestEnv || isDevEnv
+      const csvData = !isProdEnv
         ? fs.readFileSync(csvFilePath, 'utf8')
         : (await storage!.bucket(bucketName).file(csvFilePath).download())[0].toString();
 

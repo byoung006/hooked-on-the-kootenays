@@ -17,6 +17,7 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 ./server/.env
+./secrets/
 ./server/secrets/
 ./secrets/
 # Editor directories and files
@@ -32,3 +33,4 @@ coverage
 *.tsbuildinfo
 server/secrets/hooked-on-the-koots-4b43507ee9e9.json
 .vercel
+secrets/key.json

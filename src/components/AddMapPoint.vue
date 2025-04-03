@@ -368,6 +368,11 @@ export default defineComponent({
     /* Reduce font size on mobile */
   }
 
+  .hikeDifficulty .field .input {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
   .modal-wrapper .field-wrapper .hikeDifficulty .label {
     text-align: center;
   }

@@ -68,7 +68,7 @@ export default defineComponent({
     const view = new MapView({
       map: map,
       center: [-116, 50],
-      navigation: { browserTouchPanEnabled: true, momentumEnabled: true },
+      navigation: { browserTouchPanEnabled: false, momentumEnabled: false },
       zoom: 8,
     });
     const graphicsLayer = new GraphicsLayer({})
